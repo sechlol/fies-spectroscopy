@@ -1,4 +1,5 @@
-# FIES-Spectroscopy
+# FIES Spectroscopy: Analysis of Stellar Activity and Rotation Parameters
+[![DOI](https://zenodo.org/badge/1029184911.svg)](https://doi.org/10.5281/zenodo.16622703)
 
 Spectral analysis of FIES data for determination of stars' rotational velocity and chromospheric activity.
 
@@ -93,3 +94,21 @@ The analysis produces several outputs:
 
 All results are saved under the `data/out/` directory.
 
+## How to Cite
+
+If you use this code or data in your research, please cite it as:
+
+```bibtex
+@software{sechlol_fies_spectroscopy_2025,
+  author       = {Cardin, Christian},
+  title        = {{FIES Spectroscopy: Analysis of Stellar Activity and Rotation Parameters}},
+  month        = jul,
+  year         = 2025,
+  publisher    = {Zenodo},
+  version      = {v1.0.0},
+  doi          = {10.5281/zenodo.16622703},
+  url          = {https://doi.org/10.5281/zenodo.16622703}
+}
+```
+
+This project is archived on Zenodo: https://doi.org/10.5281/zenodo.16622703
