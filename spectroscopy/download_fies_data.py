@@ -2,10 +2,10 @@ import multiprocessing
 import os
 import re
 from pathlib import Path
-
 import requests
 
-_FIES_URL = "https://kirnis.kapsi.fi/NOT2023/data/"
+from paths import FIES_REPO_URL, FITS_DATA_FOLDER
+
 _FITS_RE = re.compile(r'<a href="(.*.fits)">.*</a>')
 _FOLDERS_RE = re.compile(r'<a href="(.*/)">.*/</a>')
 
@@ -58,17 +58,16 @@ def _download_files(links: list[str], base_url: str, base_path: Path) -> tuple[s
 def download_spectra(out_folder: Path):
     print("### Downloading FIES data ###")
 
-    print("\t * Crawling url", _FIES_URL)
-    fies_urls = _crawl_fits_links(_FIES_URL)
+    print("\t * Crawling url", FIES_REPO_URL)
+    fies_urls = _crawl_fits_links(FIES_REPO_URL)
     print(f"\t * Found {len(fies_urls)} urls")
 
     print(f"\t * Downloading files into {out_folder}")
-    succeeded, failed = _download_files(links=fies_urls, base_url=_FIES_URL, base_path=out_folder)
+    succeeded, failed = _download_files(links=fies_urls, base_url=FIES_REPO_URL, base_path=out_folder)
     print(f"\t * {len(succeeded)} succeeded, {len(failed)} failed")
     for f in failed:
         print(f"\t\t - Failed: {f}")
 
 
 if __name__ == "__main__":
-    _out_folder = Path.cwd() / "data/fits/"
-    download_spectra(_out_folder)
+    download_spectra(out_folder=FITS_DATA_FOLDER)

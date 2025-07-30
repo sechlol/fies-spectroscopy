@@ -44,12 +44,12 @@ def normalize_continuum_slice(
     iterations: Optional[int] = 4,
     w_min: Optional[float] = 0,
     w_max: Optional[float] = np.inf,
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     data_slice = slice_spectrum_data(data, w_min, w_max)
     return normalize_continuum(data_slice, degree=degree, iterations=iterations)
 
 
-def normalize_continuum(data: np.ndarray, degree: int, iterations: Optional[int] = 4) -> Tuple[np.ndarray, np.ndarray]:
+def normalize_continuum(data: np.ndarray, degree: int, iterations: Optional[int] = 4) -> tuple[np.ndarray, np.ndarray]:
     x_full = data[:, 0]
     y_full = data[:, 1]
     x = x_full.copy()
@@ -75,7 +75,7 @@ def normalize_continuum(data: np.ndarray, degree: int, iterations: Optional[int]
     return np.vstack([x_full, y_normalized]).T, np.array(fits)
 
 
-def _rotational_profile(x: np.ndarray, x0: float, vsini: float) -> np.ndarray:
+def rotational_profile(x: np.ndarray, x0: float, vsini: float) -> np.ndarray:
     """
     Reference paper:
         - Accurate stellar rotational velocities using the Fourier transform of the cross correlation maximum
@@ -100,7 +100,7 @@ def estimate_vsini(normalized_feature: np.ndarray, central_feature: float) -> fl
     y_minmax = minmax_scale(normalized_feature[:, 1])
 
     def loss_function(vsini: float):
-        g = _rotational_profile(normalized_feature[:, 0], central_feature, vsini)
+        g = rotational_profile(normalized_feature[:, 0], central_feature, vsini)
         mae = np.abs(minmax_scale(g) - y_minmax).sum()
         return mae
 

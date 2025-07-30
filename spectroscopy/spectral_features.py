@@ -65,7 +65,7 @@ def calculate_log_ro(b_v: float, p_rot: float) -> float:
     return np.log10(p_rot * 10**log_tc)
 
 
-def _get_triangular_function(n: int):
+def get_triangular_function(n: int):
     a = 0
     b = n
     center = (a + b + 1) / 2
@@ -96,7 +96,7 @@ def _get_integrals_of_hk_bands(data: np.ndarray):
         x = data[i, 0]
 
         # For H and K, multiply the curve by a triangular function
-        y_triangular_normalizer = _get_triangular_function(len(x))
+        y_triangular_normalizer = get_triangular_function(len(x))
         y = data[i, 1] * y_triangular_normalizer
         integrals[line] = np.trapz(y=y, x=x)
 

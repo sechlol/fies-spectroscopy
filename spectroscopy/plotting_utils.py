@@ -25,7 +25,9 @@ def save_rhk_ro_plot(rhk: dict[str, float], ro: dict[str, float], out_file: Path
 
 
 def save_chromospheric_lines_plot(
-    vrad_corrected_spectra: dict[str, np.ndarray], emission_lines: dict[str, tuple[str, float]], out_path: Path
+    vrad_corrected_spectra: dict[str, np.ndarray],
+    emission_lines: dict[str, tuple[str, float]],
+    out_path: Path,
 ):
     for target, data in vrad_corrected_spectra.items():
         fig, axes = plt.subplots(2, 3, figsize=(10, 6))
@@ -85,7 +87,7 @@ def plot_zoom(spectra: list[Spectrum], central_wavelengths: list[float], width: 
             axes[i * cols + j].axvline(w, color="red")
             axes[i * cols + j].plot(interval[:, 0], interval[:, 1])
             axes[i * cols + j].set(
-                title=f"{spectrum.target_name} ({spectrum.id}): $\lambda = {w} \pm {half_width:.3f}$"
+                title=rf"{spectrum.target_name} ({spectrum.id}): $\lambda = {w} \pm {half_width:.3f}$"
             )
     plt.tight_layout()
     plt.show()
@@ -105,7 +107,7 @@ def plot_spectral_features(
         ax.axvline(feature.w, color="red", label=f"w = {feature.w}")
         ax.plot(x, interval[:, 1], label="Original")
         ax.plot(x, interval[::-1][:, 1], label="Specular")
-        ax.set(title=f"{feature.name} - Residual $\mu = {mean_residual:.5f}$", xlabel="$\lambda [Å]$")
+        ax.set(title=rf"{feature.name} - Residual $\mu = {mean_residual:.5f}$", xlabel=r"$\lambda [Å]$")
         ax.legend()
 
     plt.suptitle(f"{spectrum.target_name} - ({spectrum.id}) - spectral features")
@@ -120,7 +122,7 @@ def plot_raw_spectra(spectra: list[Spectrum]):
 
     for spectrum, ax in zip(spectra, axes):
         ax.plot(spectrum.data[:, 0], spectrum.data[:, 1])
-        ax.set(title=f"{spectrum.target_name} - {spectrum.id}", xlabel="$\lambda [Å]$")
+        ax.set(title=f"{spectrum.target_name} - {spectrum.id}", xlabel=r"$\lambda [Å]$")
 
     plt.tight_layout()
     plt.show()
@@ -141,9 +143,9 @@ def plot_residuals_from_mean(spectra: list[Spectrum]):
         ax1.legend()
         ax2.legend()
 
-    ax1.set(title=f"{spectra[0].target_name} Residuals from the mean spectrum", xlabel="$\lambda [Å]$")
+    ax1.set(title=f"{spectra[0].target_name} Residuals from the mean spectrum", xlabel=r"$\lambda [Å]$")
     ax2.set(
-        title=f"{spectra[0].target_name} Relative errors from the mean spectrum", xlabel="$\lambda [Å]$", ylim=(-2, 2)
+        title=f"{spectra[0].target_name} Relative errors from the mean spectrum", xlabel=r"$\lambda [Å]$", ylim=(-2, 2)
     )
     plt.tight_layout()
     plt.show()

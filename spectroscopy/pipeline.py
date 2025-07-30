@@ -1,9 +1,9 @@
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 
 from download_fies_data import download_spectra
+
+import paths
 from spectroscopy.fies_utils import (
     estimate_v_rad,
     correct_spectrum_for_vrad,
@@ -20,22 +20,6 @@ from spectroscopy.spectral_features import (
     CaII_EMISSION_LINES,
 )
 from spectroscopy.spectrum_loader import SpectrumLoader
-
-# Input data
-_DATA_FOLDER = Path.cwd() / "data"
-_FITS_DATA_FOLDER = _DATA_FOLDER / "fits"
-_OBSERVATIONS_FILE = _DATA_FOLDER / "observations.csv"
-_STAR_DATA = _DATA_FOLDER / "star_data.csv"
-
-# Output data
-_OUT_DATA_FOLDER = _DATA_FOLDER / "out"
-_AVERAGED_FILE = _OUT_DATA_FOLDER / "1_averaged_spectra.npz"
-_VRAD_CORRECTED_FILE = _OUT_DATA_FOLDER / "2_vrad_corrected_spectra.npz"
-_CONTINUUM_NORMALIZED_FILE = _OUT_DATA_FOLDER / "3_continuum_corrected_spectra.npz"
-_COMPARISON_PLOT = _OUT_DATA_FOLDER / "rhk_ro_comparison.png"
-_VSINI_PLOT = _OUT_DATA_FOLDER / "vsini_comparison.png"
-_DATAFRAME_FILE = _OUT_DATA_FOLDER / "results.csv"
-_DATAFRAME_JSON_FILE = _OUT_DATA_FOLDER / "results.json"
 
 # Fitting parameters
 _fitting_default = {"degree": 4, "iterations": 8}
@@ -55,7 +39,7 @@ def average_multiple_spectra() -> dict[str, np.ndarray]:
     # and the reduced spectra doesn't align with the one taken the next day (26/10/2023)
     excluded_spectra = ["FIGj250094", "FIGj250095"]
 
-    loader = SpectrumLoader(fits_path=_FITS_DATA_FOLDER, observations_path=_OBSERVATIONS_FILE)
+    loader = SpectrumLoader(fits_path=paths.FITS_DATA_FOLDER, observations_path=paths.OBSERVATIONS_FILE)
 
     spectra = {}
     for target in loader.target_list:
@@ -163,9 +147,9 @@ def run():
     print("Running spectroscopy pipeline")
 
     # Download FIES spectra
-    if not _FITS_DATA_FOLDER.exists():
-        _FITS_DATA_FOLDER.mkdir(parents=True)
-        download_spectra(_FITS_DATA_FOLDER)
+    if not paths.FITS_DATA_FOLDER.exists():
+        paths.FITS_DATA_FOLDER.mkdir(parents=True)
+        download_spectra(paths.FITS_DATA_FOLDER)
 
     # Save average spectra in a compressed format
     averaged_spectra = average_multiple_spectra()
@@ -177,7 +161,7 @@ def run():
     normalized_slices = continuum_normalization(corrected_spectra)
 
     # Calculate chromospheric excess emission in the CaII H&K lines
-    star_data = pd.read_csv(_STAR_DATA, index_col="name")
+    star_data = pd.read_csv(paths.STAR_DATA, index_col="name")
     rhk, ro = calculate_emission(normalized_slices, star_data)
 
     # Calculate v sin i
@@ -187,23 +171,23 @@ def run():
     df = pd.DataFrame({"vrad": v_rads, "R_hk": rhk, "Ro": ro, "vsini": vsini_estimations})
 
     # Create output folder
-    _OUT_DATA_FOLDER.mkdir(parents=True, exist_ok=True)
+    paths.OUT_DATA_FOLDER.mkdir(parents=True, exist_ok=True)
 
     # Persist results on disk
     print("Persisting results...")
-    df.to_csv(_DATAFRAME_FILE, index_label="target")
-    df.to_json(_DATAFRAME_JSON_FILE, indent=4, orient="index")
+    df.to_csv(paths.DATAFRAME_FILE, index_label="target")
+    df.to_json(paths.DATAFRAME_JSON_FILE, indent=4, orient="index")
 
     # Save plots
-    save_rhk_ro_plot(rhk, ro, _COMPARISON_PLOT)
-    save_chromospheric_lines_plot(corrected_spectra, CaII_EMISSION_LINES, _OUT_DATA_FOLDER)
-    save_vsini_comparison_plot(vsini_estimations, star_data, _VSINI_PLOT)
+    save_rhk_ro_plot(rhk, ro, paths.COMPARISON_PLOT)
+    save_chromospheric_lines_plot(corrected_spectra, CaII_EMISSION_LINES, paths.OUT_DATA_FOLDER)
+    save_vsini_comparison_plot(vsini_estimations, star_data, paths.VSINI_PLOT)
 
     # Used by jupyter notebooks for further analysis
-    np.savez_compressed(_VRAD_CORRECTED_FILE, **corrected_spectra)
-    np.savez_compressed(_CONTINUUM_NORMALIZED_FILE, **normalized_slices)
+    np.savez_compressed(paths.VRAD_CORRECTED_FILE, **corrected_spectra)
+    np.savez_compressed(paths.CONTINUUM_NORMALIZED_FILE, **normalized_slices)
 
-    print(f"Results saved to {_OUT_DATA_FOLDER}")
+    print(f"Results saved to {paths.OUT_DATA_FOLDER}")
 
 
 if __name__ == "__main__":
