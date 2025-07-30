@@ -6,13 +6,7 @@ Spectral analysis of FIES data for determination of stars' rotational velocity a
 
 This project focuses on the analysis of spectroscopic data from the FIber-fed Echelle Spectrograph (FIES) at the Nordic Optical Telescope (NOT) located in La Palma, Spain. The primary goal is to study young, magnetically active solar-type stars through high-resolution spectroscopy.
 
-### Project Objectives
-
-1. **Correction of Spectra for Radial Velocity (vrad)**: Correct spectral distortions caused by stellar motion along the line of sight.
-2. **Continuum Normalization**: Normalize spectra against a well-fitted continuum curve to isolate regions of interest.
-3. **Calculating log R'HK and Comparing with Rotation**: Analyze the relationship between chromospheric activity and stellar rotation.
-4. **Comparing Line Profiles of Chromospheric Lines**: Study variations in line profiles across a sample of young solar-type stars.
-5. **Estimating v sin(i)**: Determine the projected rotational velocity of stars.
+Refer to the [report](analysis_report.pdf) for a detailed analysis and interpretation of the results.
 
 ## Quickstart
 
@@ -29,31 +23,37 @@ This project focuses on the analysis of spectroscopic data from the FIber-fed Ec
    pip install -r requirements.txt
    ```
 
-3. Download the spectral data:
+3. Download the spectral data and run the analysis pipeline:
    ```
-   cd spectroscopy
-   python download_fies_data.py
+   python -m spectroscopy.pipeline
    ```
 
-### Running the Pipeline
+The `-m` flag tells Python to run the module as a script, ensuring proper package imports regardless of the current working directory.
 
-To process all the data and generate results:
+
+### Project Objectives
+
+1. **Correction of Spectra for Radial Velocity (vrad)**: Correct spectral distortions caused by stellar motion along the line of sight.
+2. **Continuum Normalization**: Normalize spectra against a well-fitted continuum curve to isolate regions of interest.
+3. **Calculating log R'HK and Comparing with Rotation**: Analyze the relationship between chromospheric activity and stellar rotation.
+4. **Comparing Line Profiles of Chromospheric Lines**: Study variations in line profiles across a sample of young solar-type stars.
+5. **Estimating v sin(i)**: Determine the projected rotational velocity of stars.
+
+## Project Structure
 
 ```
-cd spectroscopy
-python pipeline.py
+fies-spectroscopy/
+├── analysis/           # Analysis notebooks
+├── data/               # Data directory
+│   ├── fits/           # FITS files
+│   └── out/            # Results
+├── spectroscopy/       # Python modules
+└── paths.py            # Path management
 ```
 
-This will:
-- Download FIES spectra (if not already present)
-- Average multiple spectra for each target
-- Calculate and correct for radial velocity
-- Normalize the continuum
-- Calculate chromospheric excess emission
-- Estimate v sin(i) values
-- Generate plots and save results
 
-## Data
+## Data Analysis
+
 
 The project analyzes spectroscopic data from several young solar-type stars:
 - V889Her
@@ -65,26 +65,31 @@ The project analyzes spectroscopic data from several young solar-type stars:
 - V774Tau
 - V834Tau
 
-The raw data consists of FITS images that capture the spectra of light as recorded by the sensor, which are processed using the FIESTool pipeline.
+The raw data consists of FITS images processed using the FIESTool pipeline.
 
-## Analysis Components
+### Jupyter Notebooks
+The project includes several Jupyter notebooks in the `analysis` directory:
 
-The project includes several Jupyter notebooks that showcase each analysis step:
+1. `1_spectrum_visualization.ipynb`: Visualizes raw spectra and demonstrates plotting capabilities for examining spectral features across different targets.
 
-1. `1_spectrum_visualization.ipynb`: Visualization of the raw and processed spectra
-2. `2_vrad_estimation.ipynb`: Estimation of radial velocity
-3. `3_spectrum_normalization.ipynb`: Normalization of the continuum
-4. `4_line_emission.ipynb`: Analysis of emission lines
-5. `5_line_comparison.ipynb`: Comparison of chromospheric lines
-6. `6_vsini_estimation.ipynb`: Estimation of v sin(i)
+2. `2_vrad_estimation.ipynb`: Estimates and corrects for radial velocity (${\text{vrad}}$) to account for Doppler shifting due to stellar motion and Earth's rotation.
+
+3. `3_spectrum_normalization.ipynb`: Normalizes the continuum in spectral regions of interest, particularly around ${\text{CaII}}$ emission bands, using polynomial fitting.
+
+4. `4_line_emission.ipynb`: Calculates chromospheric activity indices ($\log R'_{HK}$) and compares them with rotation parameters (Rossby number) to analyze magnetic activity.
+
+5. `5_line_comparison.ipynb`: Compares spectral line profiles across different stars, focusing on chromospheric emission lines to identify patterns in magnetic activity.
+
+6. `6_vsini_estimation.ipynb`: Estimates projected rotational velocity ($v \sin i$) by analyzing the broadening of absorption lines and comparing with literature values.
 
 ## Results
 
 The analysis produces several outputs:
 - Radial velocity corrections for each star
 - Normalized spectra for analysis of specific spectral features
-- Calculation of R'HK and Rossby number (Ro) for each star
-- Estimation of v sin(i) values
+- Calculation of $R'_{HK}$ and Rossby number ($R_o$) for each star
+- Estimation of $v \sin i$ values
 - Comparative plots of chromospheric line features
 
-All results are saved in the `data/out/` directory.
+All results are saved under the `data/out/` directory.
+
