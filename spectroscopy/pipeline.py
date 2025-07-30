@@ -1,9 +1,8 @@
 import numpy as np
 import pandas as pd
-
-from download_fies_data import download_spectra
-
 import paths
+
+from spectroscopy.download_fies_data import download_spectra
 from spectroscopy.fies_utils import (
     estimate_v_rad,
     correct_spectrum_for_vrad,

@@ -56,21 +56,38 @@ def normalize_continuum(data: np.ndarray, degree: int, iterations: Optional[int]
     y = y_full.copy()
     fits = []
 
+    # Scale x values to improve numerical stability and avoid the RankWarning
+    x_mean = np.mean(x)
+    x_scale = np.max(np.abs(x - x_mean)) or 1.0  # Avoid division by zero
+
+    # Helper function for scaling x values
+    def scale(x: np.ndarray) -> np.ndarray:
+        return (x - x_mean) / x_scale
+
     # Continuum normalisation with an iterative linear fit
     # storing intermediate continuum fits in conts
     coefficients = np.zeros(degree)
+
     for _ in range(iterations):
-        coefficients = np.polyfit(x, y, deg=degree)
-        y_fit_full = np.polyval(coefficients, x_full)
+        # Use scaled x values for fitting to improve numerical stability
+        x_scaled = scale(x)
+
+        # Suppress the RankWarning
+        with np.errstate(invalid="ignore"):
+            coefficients = np.polyfit(x_scaled, y, deg=degree, rcond=None)
+
+        # Convert coefficients back to the original scale for evaluation
+        y_fit_full = np.polyval(coefficients, scale(x_full))
         fits.append(y_fit_full)
 
-        y_fit_subset = np.polyval(coefficients, x)
+        y_fit_subset = np.polyval(coefficients, scale(x))
         y_normalized = y / y_fit_subset
         i_above_mean = y_normalized > np.mean(y_normalized)
         y = y[i_above_mean]
         x = x[i_above_mean]
 
-    final_fit = np.polyval(coefficients, x_full)
+    # Final evaluation using scaled x values
+    final_fit = np.polyval(coefficients, scale(x_full))
     y_normalized = y_full / final_fit
     return np.vstack([x_full, y_normalized]).T, np.array(fits)
 

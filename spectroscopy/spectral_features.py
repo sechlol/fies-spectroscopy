@@ -87,7 +87,7 @@ def _get_integrals_of_hk_bands(data: np.ndarray):
     for line in ["V", "R"]:
         x1, x2 = CaII_EMISSION_BANDS[line]
         i = (x1 < data[:, 0]) & (data[:, 0] < x2)
-        integrals[line] = np.trapz(y=data[i, 1], x=data[i, 0])
+        integrals[line] = np.trapezoid(y=data[i, 1], x=data[i, 0])
 
     # H and K need to be multiplied by a triangular function
     for line in ["H", "K"]:
@@ -98,6 +98,6 @@ def _get_integrals_of_hk_bands(data: np.ndarray):
         # For H and K, multiply the curve by a triangular function
         y_triangular_normalizer = get_triangular_function(len(x))
         y = data[i, 1] * y_triangular_normalizer
-        integrals[line] = np.trapz(y=y, x=x)
+        integrals[line] = np.trapezoid(y=y, x=x)
 
     return integrals
